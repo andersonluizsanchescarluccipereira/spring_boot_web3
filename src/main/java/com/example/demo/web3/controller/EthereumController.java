@@ -1,8 +1,10 @@
 package com.example.demo.web3.controller;
 
+import com.example.demo.web3.dto.TransacaoRequest;
 import com.example.demo.web3.service.EthereumService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 public class EthereumController {
@@ -14,5 +16,16 @@ public class EthereumController {
     @GetMapping("/ethereum/version")
     public String getEthereumVersion() throws Exception {
         return ethereumService.getClientVersion();
+    }
+    @PostMapping("/ethereum/send")
+    public String enviar(@RequestBody TransacaoRequest request) throws Exception {
+        return "Transação enviada! Hash: " +
+                ethereumService.sendTransaction(request.getEnderecoDestino(), request.getValorEth());
+    }
+
+    // Endpoint para buscar saldo de um endereço
+    @GetMapping("/ethereum/valueeth/{address}")
+    public BigDecimal saldo(@PathVariable String address) throws Exception {
+        return ethereumService.buscarSaldo(address);
     }
 }
