@@ -4,26 +4,41 @@ import java.math.BigDecimal;
 
 public class TransacaoRequest {
 
-    // Endereço do contrato ContaCorrente no Ganache
+    // Usado para interações com contrato
     private String contratoAddress;
 
-    // Valor em ETH a depositar ou sacar
+    // Usado para transferências diretas
+    private String fromPrivateKey;
+    private String toAddress;
+
+    // Valor em ETH (comum para todos)
     private BigDecimal valorEth;
 
-    public TransacaoRequest() {
-    }
+    public TransacaoRequest() {}
 
-    public TransacaoRequest(String contratoAddress, BigDecimal valorEth) {
-        this.contratoAddress = contratoAddress;
-        this.valorEth = valorEth;
-    }
-
+    // Getters e Setters
     public String getContratoAddress() {
         return contratoAddress;
     }
 
     public void setContratoAddress(String contratoAddress) {
         this.contratoAddress = contratoAddress;
+    }
+
+    public String getFromPrivateKey() {
+        return fromPrivateKey;
+    }
+
+    public void setFromPrivateKey(String fromPrivateKey) {
+        this.fromPrivateKey = fromPrivateKey;
+    }
+
+    public String getToAddress() {
+        return toAddress;
+    }
+
+    public void setToAddress(String toAddress) {
+        this.toAddress = toAddress;
     }
 
     public BigDecimal getValorEth() {

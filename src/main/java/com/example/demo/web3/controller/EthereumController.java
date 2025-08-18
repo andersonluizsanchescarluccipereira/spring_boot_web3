@@ -41,4 +41,14 @@ public class EthereumController {
         return "Saque realizado! Hash: " +
                 ethereumService.sacar(request.getContratoAddress(), request.getValorEth());
     }
+    // 🚀 Transferência direta entre contas (fora do contrato)
+    @PostMapping("/transferir")
+    public String transferir(@RequestBody TransacaoRequest request) throws Exception {
+        return "🔁 Transferência concluída! Hash: " +
+                ethereumService.transferir(
+                        request.getFromPrivateKey(),
+                        request.getToAddress(),
+                        request.getValorEth()
+                );
+    }
 }

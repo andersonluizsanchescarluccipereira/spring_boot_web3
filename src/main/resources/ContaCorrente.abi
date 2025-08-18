@@ -20,6 +20,24 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "destinatario",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "valor",
+				"type": "uint256"
+			}
+		],
+		"name": "transferir",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "consultarSaldo",
 		"outputs": [

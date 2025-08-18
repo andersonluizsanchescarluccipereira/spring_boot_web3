@@ -16,4 +16,6 @@ public interface EthereumService {
 
     // Saca valor da conta no contrato
     String sacar(String contratoAddress, BigDecimal valorEth) throws Exception;
+
+    String transferir(String fromPrivateKey, String toAddress, BigDecimal valorEth) throws Exception;
 }
