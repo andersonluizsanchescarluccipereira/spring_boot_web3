@@ -1,17 +1,14 @@
 package com.example.demo.web3.service.impl;
 
+import com.example.demo.web3.contract.ContaCorrente; // wrapper gerado do contrato
 import com.example.demo.web3.service.EthereumService;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.RawTransaction;
-import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
+import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.TransactionManager;
+import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Convert;
-import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -19,88 +16,56 @@ import java.math.BigInteger;
 
 @Service
 public class EthereumServiceImpl implements EthereumService {
+
     private final Web3j web3j;
     private final String chavePrivada;
+    private final Credentials credentials;
+
     public EthereumServiceImpl(Web3j web3j) {
         this.web3j = web3j;
-        // Lê a chave privada da variável de ambiente
         this.chavePrivada = System.getenv("PRIVATE_KEY");
         if (this.chavePrivada == null || this.chavePrivada.isEmpty()) {
-            throw new RuntimeException("Variável de ambiente CHAVE_PRIVADA não definida!");
+            throw new RuntimeException("Variável de ambiente PRIVATE_KEY não definida!");
         }
+        this.credentials = Credentials.create(chavePrivada);
     }
+
     public String getClientVersion() throws IOException {
-        Web3ClientVersion clientVersion = web3j.web3ClientVersion().send();
-        return clientVersion.getWeb3ClientVersion();
+        return web3j.web3ClientVersion().send().getWeb3ClientVersion();
     }
 
-    @Override
-    public String sendTransaction(String enderecoDestino, BigDecimal valorEth) throws Exception {
-        Credentials credentials = Credentials.create(chavePrivada);
-
-        EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(
-                credentials.getAddress(), org.web3j.protocol.core.DefaultBlockParameterName.LATEST
-        ).send();
-
-        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
-        BigInteger valorWei = Convert.toWei(valorEth, Convert.Unit.ETHER).toBigInteger();
-        BigInteger gasPrice = BigInteger.valueOf(20_000_000_000L);
-        BigInteger gasLimit = BigInteger.valueOf(21_000);
-
-        RawTransaction rawTransaction = RawTransaction.createEtherTransaction(
-                nonce, gasPrice, gasLimit, enderecoDestino, valorWei
+    // Carrega o contrato usando RawTransactionManager
+    private ContaCorrente carregarContrato(String contratoAddress) {
+        TransactionManager txManager = new RawTransactionManager(web3j, credentials);
+        return ContaCorrente.load(
+                contratoAddress,
+                web3j,
+                txManager,
+                new DefaultGasProvider()
         );
-
-        byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
-        String hexValue = Numeric.toHexString(signedMessage);
-
-        EthSendTransaction transactionResponse = web3j.ethSendRawTransaction(hexValue).send();
-        return transactionResponse.getTransactionHash();
     }
-    public BigDecimal buscarSaldo(String endereco) throws Exception {
-        BigInteger saldoWei = web3j.ethGetBalance(endereco, DefaultBlockParameterName.LATEST)
-                .send()
-                .getBalance();
-        // Converter de Wei para Ether
+
+    // Deposita valor no contrato (função payable)
+    public String depositar(String contratoAddress, BigDecimal valorEth) throws Exception {
+        ContaCorrente contrato = carregarContrato(contratoAddress);
+        BigInteger valorWei = Convert.toWei(valorEth, Convert.Unit.ETHER).toBigInteger();
+
+        // Passa o valor em Wei na transação
+        return contrato.depositar(valorWei).send().getTransactionHash();
+    }
+
+    // Consulta saldo do contrato
+    public BigDecimal consultarSaldo(String contratoAddress) throws Exception {
+        ContaCorrente contrato = carregarContrato(contratoAddress);
+        BigInteger saldoWei = contrato.consultarSaldo().send();
         return Convert.fromWei(new BigDecimal(saldoWei), Convert.Unit.ETHER);
     }
-    private void validarChave(String endereco) {
-        Credentials credentials = Credentials.create(chavePrivada);
-        if (!credentials.getAddress().equalsIgnoreCase(endereco)) {
-            throw new RuntimeException("Chave privada não corresponde ao endereço remetente");
-        }
-    }
 
-    // Transferência segura
-    public String transferir(String enderecoRemetente, String enderecoDestino, BigDecimal valorEth) throws Exception {
-        // 1️⃣ Validar chave
-        validarChave(enderecoRemetente);
-
-        // 2️⃣ Verificar saldo
-        BigDecimal saldo = buscarSaldo(enderecoRemetente);
-        if (saldo.compareTo(valorEth) < 0) {
-            throw new RuntimeException("Saldo insuficiente");
-        }
-
-        // 3️⃣ Criar e enviar transação
-        Credentials credentials = Credentials.create(chavePrivada);
-        EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(
-                enderecoRemetente, DefaultBlockParameterName.LATEST
-        ).send();
-
-        BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+    // Saca valor do contrato
+    public String sacar(String contratoAddress, BigDecimal valorEth) throws Exception {
+        ContaCorrente contrato = carregarContrato(contratoAddress);
         BigInteger valorWei = Convert.toWei(valorEth, Convert.Unit.ETHER).toBigInteger();
-        BigInteger gasPrice = BigInteger.valueOf(20_000_000_000L);
-        BigInteger gasLimit = BigInteger.valueOf(21_000);
 
-        RawTransaction rawTransaction = RawTransaction.createEtherTransaction(
-                nonce, gasPrice, gasLimit, enderecoDestino, valorWei
-        );
-
-        byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
-        String hexValue = Numeric.toHexString(signedMessage);
-
-        EthSendTransaction transactionResponse = web3j.ethSendRawTransaction(hexValue).send();
-        return transactionResponse.getTransactionHash();
+        return contrato.sacar(valorWei).send().getTransactionHash();
     }
 }

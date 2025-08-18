@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>org.web3j</groupId>
 			<artifactId>core</artifactId>
-			<version>4.10.3</version> <!-- ou a versão mais recente -->
+			<version>4.10.3</version>
 		</dependency>
 	</dependencies>
 
@@ -78,6 +78,26 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.web3j</groupId>
+				<artifactId>web3j-maven-plugin</artifactId>
+				<version>4.10.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-sources</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<soliditySourceFiles>
+						<directory>src/main/resources</directory>
+					</soliditySourceFiles>
+					<outputDirectory>src/main/java</outputDirectory>
+					<packageName>com.example.demo.web3.contract</packageName>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

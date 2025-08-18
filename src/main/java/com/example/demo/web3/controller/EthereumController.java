@@ -1,41 +1,44 @@
 package com.example.demo.web3.controller;
 
-import com.example.demo.web3.dto.TransacaoRequest;
-import com.example.demo.web3.dto.TransferenciaRequest;
+import com.example.demo.web3.dto.TransacaoRequest; // vamos usar para depositar/sacar
 import com.example.demo.web3.service.EthereumService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
 @RestController
+@RequestMapping("/ethereum")
 public class EthereumController {
+
     private final EthereumService ethereumService;
 
     public EthereumController(EthereumService ethereumService) {
         this.ethereumService = ethereumService;
     }
-    @GetMapping("/ethereum/version")
+
+    // Retorna a versão do cliente Web3
+    @GetMapping("/version")
     public String getEthereumVersion() throws Exception {
         return ethereumService.getClientVersion();
     }
-    @PostMapping("/ethereum/send")
-    public String enviar(@RequestBody TransacaoRequest request) throws Exception {
-        return "Transação enviada! Hash: " +
-                ethereumService.sendTransaction(request.getEnderecoDestino(), request.getValorEth());
+
+    // Deposita valor no contrato
+    @PostMapping("/depositar")
+    public String depositar(@RequestBody TransacaoRequest request) throws Exception {
+        return "Depósito enviado! Hash: " +
+                ethereumService.depositar(request.getContratoAddress(), request.getValorEth());
     }
 
-    // Endpoint para buscar saldo de um endereço
-    @GetMapping("/ethereum/valueeth/{address}")
-    public BigDecimal saldo(@PathVariable String address) throws Exception {
-        return ethereumService.buscarSaldo(address);
+    // Consulta saldo no contrato
+    @GetMapping("/saldo/{contratoAddress}")
+    public BigDecimal consultarSaldo(@PathVariable String contratoAddress) throws Exception {
+        return ethereumService.consultarSaldo(contratoAddress);
     }
-    @PostMapping("/ethereum/transfer")
-    public String transferir(@RequestBody TransferenciaRequest request) throws Exception {
-        return "Transação enviada! Hash: " +
-                ethereumService.transferir(
-                        request.getEnderecoRemetente(),
-                        request.getEnderecoDestino(),
-                        request.getValorEth()
-                );
+
+    // Saca valor do contrato
+    @PostMapping("/sacar")
+    public String sacar(@RequestBody TransacaoRequest request) throws Exception {
+        return "Saque realizado! Hash: " +
+                ethereumService.sacar(request.getContratoAddress(), request.getValorEth());
     }
 }
