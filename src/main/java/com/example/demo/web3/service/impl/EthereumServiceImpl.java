@@ -5,6 +5,7 @@ import com.example.demo.web3.service.EthereumService;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.Transfer;
@@ -49,10 +50,14 @@ public class EthereumServiceImpl implements EthereumService {
     // Deposita valor no contrato (função payable)
     public String depositar(String contratoAddress, BigDecimal valorEth) throws Exception {
         ContaCorrente contrato = carregarContrato(contratoAddress);
+
+        // Converte o valor em Ether para Wei
         BigInteger valorWei = Convert.toWei(valorEth, Convert.Unit.ETHER).toBigInteger();
 
-        // Passa o valor em Wei na transação
-        return contrato.depositar(valorWei).send().getTransactionHash();
+        // Chama o método depositar do contrato, passando o valor em Wei
+        TransactionReceipt receipt = contrato.depositar(valorWei).send();
+
+        return receipt.getTransactionHash();
     }
 
     // Consulta saldo do contrato
