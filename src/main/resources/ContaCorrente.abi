@@ -1,13 +1,129 @@
 [
 	{
-		"inputs": [],
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "titular",
+				"type": "address"
+			}
+		],
+		"name": "ContaCriada",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			}
+		],
+		"name": "criarConta",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			}
+		],
 		"name": "depositar",
 		"outputs": [],
 		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "remetente",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valor",
+				"type": "uint256"
+			}
+		],
+		"name": "Deposito",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "deContrato",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "paraContrato",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "valor",
+				"type": "uint256"
+			}
+		],
+		"name": "pix",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "deContrato",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "paraContrato",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valor",
+				"type": "uint256"
+			}
+		],
+		"name": "PixRealizado",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			},
 			{
 				"internalType": "uint256",
 				"name": "valor",
@@ -20,31 +136,73 @@
 		"type": "function"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
 				"internalType": "address",
-				"name": "destinatario",
+				"name": "titular",
 				"type": "address"
 			},
 			{
+				"indexed": false,
 				"internalType": "uint256",
 				"name": "valor",
 				"type": "uint256"
 			}
 		],
-		"name": "transferir",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		"name": "Saque",
+		"type": "event"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			}
+		],
 		"name": "consultarSaldo",
 		"outputs": [
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "numeroContrato",
+				"type": "uint256"
+			}
+		],
+		"name": "verConta",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "titular",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "saldo",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "existe",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
